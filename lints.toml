@@ -1,3 +1,6 @@
+#
+# For all clippy lints please visit: https://rust-lang.github.io/rust-clippy/master/
+#
 deny = [
     'clippy::all',
     'clippy::cargo',

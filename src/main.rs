@@ -9,6 +9,11 @@ use structopt::StructOpt;
 #[derive(Debug, StructOpt)]
 #[structopt(name = "cargo lints")]
 /// Utility for working with specific lints of clippy
+enum Cargo {
+    Lints(Args),
+}
+
+#[derive(Debug, StructOpt)]
 struct Args {
     /// Path to lints.toml file
     #[structopt(short, long, parse(from_os_str))]
@@ -42,6 +47,10 @@ struct Lints {
 }
 
 const LINTS_FILE: &str = "lints.toml";
+const COMMENT: &str = r#"#
+# For all clippy lints please visit: https://rust-lang.github.io/rust-clippy/master/
+#
+"#;
 
 impl Lints {
     pub fn find_config_file() -> Result<Option<PathBuf>> {
@@ -88,6 +97,7 @@ impl Lints {
         self.warn.sort();
         toml::to_string_pretty(&self)
             .wrap_err("Failed to format toml to string")
+            .map(|s| COMMENT.to_owned() + &s)
             .map(|content| fs::write(file, content))?
             .wrap_err("Failed to write lints to file")
     }
@@ -130,12 +140,17 @@ impl Lints {
 }
 
 fn main() -> Result<()> {
-    let Args { cmd, file } = Args::from_args();
+    let Cargo::Lints(Args { cmd, file }) = Cargo::from_args();
     let mut lints =
         file.map_or_else(Lints::from_config, Lints::from_config_with_path)?;
 
     match cmd {
         Subcommands::Fmt => lints.fmt(),
-        Subcommands::Clippy(args) => lints.clippy(&args[1..]),
+        Subcommands::Clippy(args) if args[0] == "clippy" => {
+            lints.clippy(&args[1..])
+        }
+        Subcommands::Clippy(args) => {
+            Err(eyre!("Unknown subcommand: `{}'", args[0]))
+        }
     }
 }

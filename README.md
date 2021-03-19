@@ -4,8 +4,16 @@ This is an utility for running lints specified from files.
 
 ## Use case
 
-Sometimes lint configuration can be very big and not shared between binaries crates (in workspace).
-For now `cargo` and `clippy` doesn't provide convinient way to specify lints enabled for workspace, so what is
+It is hard to share lint configuration in cargo workspace. Even more, so for lint configuration of form:
+``` rust
+$ cat src/lib.rs
+#![warn(clippy::all)]
+...
+```
+
+Is not shared with tests and benchmark binaries in `./benches/` and `./tests` directories.
+
+For now `cargo` and `clippy` don't provide convinient way to specify lints enabled for workspace, so that is
 why it is handy to have such an utility.
 
 ## Installation
@@ -21,6 +29,9 @@ You should set some lints in `lints.toml` file:
 
 ### `$ cat lints.toml`
 ```toml
+#
+# For all clippy lints please visit: https://rust-lang.github.io/rust-clippy/master/
+#
 deny = [
     'clippy::all',
     'clippy::cargo',
