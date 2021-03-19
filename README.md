@@ -2,6 +2,12 @@
 
 This is an utility for running lints specified from files.
 
+## Use case
+
+Sometimes lint configuration can be very big and not shared between binaries crates (in workspace).
+For now `cargo` and `clippy` doesn't provide convinient way to specify lints enabled for workspace, so what is
+why it is handy to have such an utility.
+
 ## Installation
 
 Install with:
