@@ -1,0 +1,14 @@
+deny = [
+    'clippy::all',
+    'clippy::cargo',
+    'clippy::nursery',
+    'clippy::pedantic',
+]
+allow = [
+    'clippy::enum_glob_use',
+    'clippy::implicit_return',
+    'clippy::must_use_candidate',
+    'clippy::use_self',
+    'clippy::wildcard_imports',
+]
+warn = []
