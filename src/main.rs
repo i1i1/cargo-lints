@@ -9,7 +9,18 @@ use structopt::StructOpt;
 #[derive(Debug, StructOpt)]
 #[structopt(name = "cargo lints")]
 /// Utility for working with specific lints of clippy
-enum Args {
+struct Args {
+    /// Path to lints.toml file
+    #[structopt(short, long, parse(from_os_str))]
+    file: Option<PathBuf>,
+    /// Subcommand
+    #[structopt(subcommand)]
+    cmd: Subcommands,
+}
+
+#[derive(Debug, StructOpt)]
+#[structopt(name = "cargo lints")]
+enum Subcommands {
     /// Formats lints.toml file
     Fmt,
     /// Runs clippy with lints enabled from lints.toml file
@@ -30,12 +41,14 @@ struct Lints {
     warn: Vec<String>,
 }
 
+const LINTS_FILE: &str = "lints.toml";
+
 impl Lints {
-    fn find_config_file() -> Result<Option<PathBuf>> {
+    pub fn find_config_file() -> Result<Option<PathBuf>> {
         let mut path =
             env::current_dir().wrap_err("Failed to get current directory")?;
         loop {
-            let lints = path.join("lints.toml");
+            let lints = path.join(LINTS_FILE);
             if !lints.exists() {
                 match path.parent() {
                     Some(parent) => path = parent.to_path_buf(),
@@ -65,7 +78,7 @@ impl Lints {
     }
 
     pub fn file(&self) -> PathBuf {
-        self.file.as_ref().expect("Always inited").clone()
+        self.file.as_ref().expect("Always initialized").clone()
     }
 
     pub fn fmt(&mut self) -> Result<()> {
@@ -73,7 +86,7 @@ impl Lints {
         self.deny.sort();
         self.warn.sort();
         toml::to_string_pretty(&self)
-            .wrap_err("Failed format toml to string")
+            .wrap_err("Failed to format toml to string")
             .map(|content| fs::write(self.file(), content))?
             .wrap_err("Failed to write lints to file")
     }
@@ -116,10 +129,12 @@ impl Lints {
 }
 
 fn main() -> Result<()> {
-    let cmd = Args::from_args();
-    let mut lints = Lints::from_config()?;
+    let Args { cmd, file } = Args::from_args();
+    let mut lints =
+        file.map_or_else(Lints::from_config, Lints::from_config_with_path)?;
+
     match cmd {
-        Args::Fmt => lints.fmt(),
-        Args::Clippy(args) => lints.clippy(&args[1..]),
+        Subcommands::Fmt => lints.fmt(),
+        Subcommands::Clippy(args) => lints.clippy(&args[1..]),
     }
 }
