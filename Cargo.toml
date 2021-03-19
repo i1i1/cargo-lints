@@ -1,5 +1,5 @@
 [package]
-name = "lints"
+name = "cargo-lints"
 version = "0.1.0"
 authors = ["i1i1"]
 edition = "2018"

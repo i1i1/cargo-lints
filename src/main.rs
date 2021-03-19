@@ -77,17 +77,18 @@ impl Lints {
         Ok(lints)
     }
 
-    pub fn file(&self) -> PathBuf {
-        self.file.as_ref().expect("Always initialized").clone()
-    }
-
     pub fn fmt(&mut self) -> Result<()> {
+        let file = self
+            .file
+            .clone()
+            .ok_or_else(|| eyre!("Failed to find file with lints"))?;
+
         self.allow.sort();
         self.deny.sort();
         self.warn.sort();
         toml::to_string_pretty(&self)
             .wrap_err("Failed to format toml to string")
-            .map(|content| fs::write(self.file(), content))?
+            .map(|content| fs::write(file, content))?
             .wrap_err("Failed to write lints to file")
     }
 
