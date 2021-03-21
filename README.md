@@ -1,20 +1,21 @@
 # cargo-lints
 
-This is an utility for running lints specified from files.
+`cargo-lints` is a utility for running lints specified from files.
 
-## Use case
+## Use Case
 
-It is hard to share lint configuration in cargo workspace. Even more, so for lint configuration of form:
+It is hard to share lint configuration in cargo workspace. Even more so as lint configuration in the form of:
+
 ``` rust
 $ cat src/lib.rs
 #![warn(clippy::all)]
 ...
 ```
 
-Is not shared with tests and benchmark binaries in `./benches/` and `./tests` directories.
+will not affect tests and benchmark binaries in `./benches/` and `./tests` directories.
 
-For now `cargo` and `clippy` don't provide convinient way to specify lints enabled for workspace, so that is
-why it is handy to have such an utility.
+For now `cargo` and `clippy` don't provide convinient way to specify lints enabled for workspace and that is
+why it is handy to have a utility such as this one.
 
 ## Installation
 
@@ -47,15 +48,15 @@ After that you can run:
 
 #### `$ cargo lint fmt`
 
-For formatting toml file.
+to format the toml file.
 
 #### `$ cargo lint clippy`
 
-For running clippy (you don't have to have `lints.toml` file, it will just run `cargo clippy`).
+to run clippy (you don't have to have `lints.toml` file - in that case it will simply run `cargo clippy`).
 
 ## Options
 
-On top level you can suply `-f` option:
+On the top level you can supply `-f` option:
 ```sh
 $ cargo lints -f custom_lints.toml clippy
 ```
@@ -65,4 +66,3 @@ Also all options after `cargo lints clippy` are forwarded to clippy:
 ```
 $ cargo lints clippy --tests --benches --all-features --all
 ```
-
